@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soil Analysis Project</title>
+  <style>
+    /* General Reset */
+    body, html {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Main Page */
+    #main-page {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: url('https://res.cloudinary.com/dwkiyg3pg/image/upload/v1737896418/pp1_mlwmwd.jpg') no-repeat center center/cover;
+      color: white;
+      text-align: center;
+    }
+
+    #main-page h1 {
+      font-size: 3.5rem;
+      color: white;
+      text-shadow: 0 0 10px brown, 0 0 20px lime, 0 0 30px lime;
+      animation: glitter 1.5s infinite alternate;
+    }
+
+    @keyframes glitter {
+      0% { text-shadow: 0 0 10px green; }
+      100% { text-shadow: 0 0 30px brown; }
+    }
+
+    #main-page p {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+    }
+
+    #main-page button {
+      padding: 12px 24px;
+      font-size: 1.2rem;
+      color: white;
+      background: brown; 
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    #main-page button:hover {
+      background: green;
+      transform: scale(1.05);
+    }
+
+    /* Input Page */
+    #input-page {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: url('https://res.cloudinary.com/dwkiyg3pg/image/upload/v1737978115/cesqfnatz2lugaz6zfg2.jpg') no-repeat center center/cover;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+      width: 300px;
+    }
+
+    form label {
+      margin: 10px 0 5px;
+      font-size: 1rem;
+      color: darkgreen;
+    }
+
+    form input {
+      padding: 10px;
+      margin-bottom: 5px;
+      border: 1px solid green;
+      border-radius: 5px;
+    }
+
+    .error {
+      color: red;
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+      display: none;
+    }
+
+    form button {
+      padding: 12px;
+      font-size: 1rem;
+      color: white;
+      background: green;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    form button:hover {
+      background: darkgreen;
+    }
+
+    #output {
+      margin-top: 20px;
+      padding: 10px;
+      background: #f0f0f0;
+      border: 1px solid green;
+      border-radius: 5px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- Main Page -->
+  <div id="main-page">
+    <h1>Crop Prediction project</h1>
+    <p>Discover the best crops for your soil conditions!The Crop Prediction System uses data science and artificial intelligence to help farmers choose the most suitable crop for their land and season. It takes input such as soil nutrients (N, P, K), weather conditions (temperature, rainfall, humidity), location, and past crop history. Using machine learning algorithms, the system analyzes these factors and predicts the best crop to grow, reducing risks of crop failure and increasing yield. This project supports sustainable farming, saves resources like water and fertilizers, and improves farmers’ income. In the future, it can be integrated with mobile apps, IoT sensors for real-time monitoring, and multilingual support to reach rural communities effectively.</p>
+    <button onclick="showInputPage()">Enter</button>
+  </div>
+
+  <!-- Input Page -->
+  <div id="input-page">
+    <form id="input-form" onsubmit="submitForm(event)">
+      <label for="soil_pH">Soil pH (4.0 - 9.0):</label>
+      <input type="number" id="soil_pH" name="soil_pH" min="4" max="9" step="0.1" required>
+
+      <label for="nitrogen">Nitrogen (0 - 200 mg/kg):</label>
+      <input type="number" id="nitrogen" name="nitrogen" min="0" max="200" required>
+
+      <label for="phosphorus">Phosphorus (0 - 150 mg/kg):</label>
+      <input type="number" id="phosphorus" name="phosphorus" min="0" max="150" required>
+
+      <label for="rainfall">Rainfall (0 - 500 mm):</label>
+      <input type="number" id="rainfall" name="rainfall" min="0" max="500" required>
+
+      <label for="temperature">Temperature (-10 - 50 °C):</label>
+      <input type="number" id="temperature" name="temperature" min="-10" max="50" required>
+
+      <button type="submit">Generate</button>
+    </form>
+    <div id="output"></div>
+  </div>
+
+  <script>
+    function showInputPage() {
+      document.getElementById('main-page').style.display = 'none';
+      document.getElementById('input-page').style.display = 'flex';
+    }
+
+    async function submitForm(event) {
+      event.preventDefault();
+      
+      let formData = new FormData(event.target);
+      
+      let response = await fetch("/predict", {
+        method: "POST",
+        body: formData
+      });
+
+      let result = await response.json();
+
+      document.getElementById("output").style.display = "block";
+      document.getElementById("output").innerHTML = `
+        <p><strong>Predicted Crop:</strong> ${result["Predicted Crop"]}</p>
+        <p><strong>Predicted Yield:</strong> ${result["Predicted Yield (kg/ha)"]} kg/ha</p>
+      `;
+    }
+  </script>
+</body>
+</html>
